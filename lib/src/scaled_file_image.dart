@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/src/painting/image_provider.dart';
 
 /// Decodes the given [File] object as an image, associating it with the given
 /// scale. If targetWidth and/or targetHeight are specified the raw image is
@@ -42,9 +43,9 @@ class ScaledFileImage extends ImageProvider<ScaledFileImage> {
   }
 
   @override
-  ImageStreamCompleter load(ScaledFileImage key) {
+  ImageStreamCompleter load(ScaledFileImage key, DecoderCallback decode) {
     return MultiFrameImageStreamCompleter(
-      codec: _loadAsync(key),
+      codec: _loadAsync(key, decode),
       scale: key.scale,
       informationCollector: () sync* {
         yield ErrorDescription('Path: ${file?.path}');
@@ -52,7 +53,7 @@ class ScaledFileImage extends ImageProvider<ScaledFileImage> {
     );
   }
 
-  Future<Codec> _loadAsync(ScaledFileImage key) async {
+  Future<Codec> _loadAsync(ScaledFileImage key, DecoderCallback decode) async {
     assert(key == this);
 
     final Uint8List bytes = await file.readAsBytes();
